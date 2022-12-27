@@ -3,6 +3,7 @@ local Player = Players.LocalPlayer
 local Character = Player.Character
 local Hitbox = Character:WaitforChild("hitbox")
 local entities = game:GetService("Workspace").placeFolders.entityManifestCollection:GetChildren()
+local Signal = ReplicatedStorage:WaitForChild("signal")
 
 godcheck = true
 local godmode 
@@ -37,7 +38,7 @@ for Index, IValue in next, getconnections(Player.Idled) do
   end
 end
 
-tpOffset = Vector3.new(0, 4, 0)
+local tpOffset = Vector3.new(0, 4, 0)
 local function Tp(targ)
   if not Hitbox then
     return
@@ -57,12 +58,26 @@ local function GetAttackable()
     end
   end
   return attackable
- end
-
-local function attack(targ)
-  
-      
-    
-local function killaura(targets)
-      
 end
+
+local function attack()
+repeat
+local attackable = GetAttackable()
+Signal:FireServer("fireEvent", "playerWillUseBasicAttack", Player)
+for Index = 1, 2 do
+  Signal:FireServer("replicatePlayerAnimationSequence", "daggerAnimations", "strike" .. tostring(Index), {attackSpeed = 0})
+  for i, entity in pairs(attackable) do
+    local ohTable2 = {
+	    [1] = {
+		  [1] = entity,
+		  [2] = Hitbox.Position,
+		  [3] = "equipment"
+	    }
+      }
+  Signal:FireServer("playerRequest_damageEntity_batch", ohTable2)
+  end
+end
+until #attackable == 0
+end      
+    
+attack()
