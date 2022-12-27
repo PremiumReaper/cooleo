@@ -1,7 +1,9 @@
 local Players = game:GetService("Players")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Player = Players.LocalPlayer
 local Character = Player.Character
-local Hitbox = Character:WaitforChild("hitbox")
+local Hitbox = Character:WaitForChild("hitbox")
 local entities = game:GetService("Workspace").placeFolders.entityManifestCollection:GetChildren()
 local Signal = ReplicatedStorage:WaitForChild("signal")
 
@@ -19,7 +21,7 @@ end)
 local function GetAttackable()
   attackable = {}
   for i, entity in pairs(entities) do
-    if entity.ClassName ~= "Model" and entity:FindFirstChild("health") and entity.health.Value  > 0 and not Value:FindFirstChild:("pet") then
+    if entity.ClassName ~= "Model" and entity:FindFirstChild("health") and entity.health.Value  > 0 and not Value:FindFirstChild("pet") then
       local Distance = (entity.Position - Hitbox.Position).Magnitude
       if Distance < 15 then
         table.insert(attackable, entity)
@@ -37,6 +39,7 @@ for Index, IValue in next, getconnections(Player.Idled) do
     IValue:Enable()
   end
 end
+end
 
 local tpOffset = Vector3.new(0, 4, 0)
 local function Tp(targ)
@@ -50,7 +53,7 @@ end
 local function GetAttackable()
   attackable = {}
   for i, entity in pairs(entities) do
-    if entity.ClassName ~= "Model" and entity:FindFirstChild("health") and entity.health.Value  > 0 and not Value:FindFirstChild:("pet") then
+    if entity.ClassName ~= "Model" and entity:FindFirstChild("health") and entity.health.Value  > 0 and not entity:FindFirstChild("pet") then
       local Distance = (entity.Position - Hitbox.Position).Magnitude
       if Distance < 15 then
         table.insert(attackable, entity)
