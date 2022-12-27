@@ -66,6 +66,7 @@ end
 local function attack()
 repeat
 local attackable = GetAttackable()
+task.wait()
 Signal:FireServer("fireEvent", "playerWillUseBasicAttack", Player)
 for Index = 1, 2 do
   Signal:FireServer("replicatePlayerAnimationSequence", "daggerAnimations", "strike" .. tostring(Index), {attackSpeed = 0})
@@ -78,6 +79,7 @@ for Index = 1, 2 do
 	    }
       }
   Signal:FireServer("playerRequest_damageEntity_batch", ohTable2)
+  task.wait(0.0001)
   end
 end
 until #attackable == 0
