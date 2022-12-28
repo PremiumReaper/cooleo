@@ -5,12 +5,14 @@ local Character = Player.Character
 local Hitbox = Character:WaitForChild("hitbox")
 local entities = game:GetService("Workspace").placeFolders.entityManifestCollection:GetChildren()
 local Signal = ReplicatedStorage:WaitForChild("signal")
+getgenv().killA = false
+getgenv().killSpeed = 1 
+getgenv().god = false
 
-godcheck = true
 local godmode 
 godmode = hookmetamethod(game, "__namecall", function(self, ...)  
   local args = {...}
-  if godcheck == true and getnamecallmethod() == "FireServer" and args[4] == "monster" then 
+  if getgenv().god == true and getnamecallmethod() == "FireServer" and args[4] == "monster" then 
     return
   end
 
@@ -29,16 +31,6 @@ local function GetAttackable()
   end
   return attackable
  end
-
-local function attack(targ)
-for Index, IValue in next, getconnections(Player.Idled) do 
-  if Value then 
-    IValue:Disable() 
-  else
-    IValue:Enable()
-  end
-end
-end
 
 local tpOffset = Vector3.new(0, 4, 0)
 local function Tp(targ)
@@ -63,29 +55,44 @@ local function GetAttackable()
 end
 
 local function aura()
-repeat
-local attackable = GetAttackable()
-task.wait()
-Signal:FireServer("fireEvent", "playerWillUseBasicAttack", Player)
-for Index = 1, 2 do
-  Signal:FireServer("replicatePlayerAnimationSequence", "daggerAnimations", "strike" .. tostring(Index), {attackSpeed = 0})
-  for i, entity in pairs(attackable) do
-    local ohTable2 = {
-	    [1] = {
-		  [1] = entity,
-		  [2] = Hitbox.Position,
-		  [3] = "equipment"
-	    }
-      }
-  Signal:FireServer("playerRequest_damageEntity_batch", ohTable2)
-  task.wait(0.0001)
-  end
+while getgenv.killA == true do
+	local attackable = GetAttackable()
+	if #attackable > 0 then
+		Signal:FireServer("fireEvent", "playerWillUseBasicAttack", Player)
+		for Index = 1, 2 do
+		  Signal:FireServer("replicatePlayerAnimationSequence", "daggerAnimations", "strike" .. tostring(Index), {attackSpeed = 0})
+		  for i, entity in pairs(attackable) do
+		    local ohTable2 = {
+			    [1] = {
+				  [1] = entity,
+				  [2] = Hitbox.Position,
+				  [3] = "equipment"
+			    }
+		      }
+		  Signal:FireServer("playerRequest_damageEntity_batch", ohTable2)
+		  task.wait(getgenv.killSpeed)
+		  end
+		end
+	end      
 end
-until #attackable == 0
-end      
+
 
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/cat"))()
 local Window = Library:CreateWindow("PremReps Vesteria Custom", Vector2.new(300, 300), Enum.KeyCode.T)
-local AutoTab = Window:CreateTab("AutoFarm")
-local 
+local autoTab = Window:CreateTab("AutoFarm")
+
+local KillAura = AutoTab:CreateSector("Kill Aura", "left")
+KillAura.AddToggle("Kill Aura", false, function(bool)
+	getgenv().killA = bool
+	if bool then
+		aura()
+	end
+end)
+
+local playerTab = Window:CreateTab("Player")
+playerTab:AddToggle("Godmode", false, function(bool)
+	getgenv().god = bool
+end)
+
+
 
