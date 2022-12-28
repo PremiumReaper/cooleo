@@ -1,5 +1,4 @@
 local Players = game:GetService("Players")
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Player = Players.LocalPlayer
 local Character = Player.Character
@@ -63,7 +62,7 @@ local function GetAttackable()
   return attackable
 end
 
-local function attack()
+local function aura()
 repeat
 local attackable = GetAttackable()
 task.wait()
@@ -84,5 +83,9 @@ for Index = 1, 2 do
 end
 until #attackable == 0
 end      
-    
-attack()
+
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/cat"))()
+local Window = Library:CreateWindow("PremReps Vesteria Custom", Vector2.new(300, 300), Enum.KeyCode.T)
+local AutoTab = Window:CreateTab("AutoFarm")
+local 
+
