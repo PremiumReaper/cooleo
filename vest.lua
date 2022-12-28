@@ -55,7 +55,8 @@ local function GetAttackable()
 end
 
 local function aura()
-while getgenv.killA == true do
+while getgenv().killA == true do
+	print("looped")
 	local attackable = GetAttackable()
 	if #attackable > 0 then
 		Signal:FireServer("fireEvent", "playerWillUseBasicAttack", Player)
@@ -70,10 +71,12 @@ while getgenv.killA == true do
 			    }
 		      }
 		  Signal:FireServer("playerRequest_damageEntity_batch", ohTable2)
-		  task.wait(getgenv.killSpeed)
 		  end
+		  
 		end
-	end      
+	end
+	task.wait(getgenv().killSpeed)      
+end
 end
 
 
@@ -81,15 +84,15 @@ local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/blood
 local Window = Library:CreateWindow("PremReps Vesteria Custom", Vector2.new(300, 300), Enum.KeyCode.T)
 local autoTab = Window:CreateTab("AutoFarm")
 
-local KillAura = AutoTab:CreateSector("Kill Aura", "left")
-KillAura.AddToggle("Kill Aura", false, function(bool)
+local KillAura = autoTab:CreateSector("Kill Aura", "left")
+KillAura:AddToggle("Kill Aura", false, function(bool)
 	getgenv().killA = bool
 	if bool then
 		aura()
 	end
 end)
 
-local playerTab = Window:CreateTab("Player")
+local playerTab = autoTab:CreateSector("Player", "right")
 playerTab:AddToggle("Godmode", false, function(bool)
 	getgenv().god = bool
 end)
