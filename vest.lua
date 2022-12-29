@@ -72,11 +72,14 @@ local function autofarm()
 	while autoFarm == true do
 		local entities = game:GetService("Workspace").placeFolders.entityManifestCollection:GetChildren()
 		for i,entity in pairs(entities) do
-			if not table.find(distinctMobs, entity.Name then
+			if not table.find(distinctMobs, entity.Name) then
 				table.insert(distinctMobs, entity.Name)
 			end
-			if entity.ClassName ~= "Model" and entity:FindFirstChild("health") and entity.health.Value > 0 and not entity:FindFirstChild("pet") then
+			if entity.ClassName ~= "Model" and autoFarm and entity:FindFirstChild("health") and entity.health.Value > 0 and not entity:FindFirstChild("pet") then
 				while entity.health.Value > 0 or not entity:FindFirstChild("health") do
+					if not autoFarm then
+						break
+					end
 					Tp(entity)
 					task.wait(0.2)
 				end
@@ -111,6 +114,4 @@ local playerTab = autoTab:CreateSector("Player", "right")
 playerTab:AddToggle("Godmode", false, function(bool)
 	getgenv().god = bool
 end)
-
-
 
