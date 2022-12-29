@@ -7,6 +7,7 @@ local Signal = ReplicatedStorage:WaitForChild("signal")
 getgenv().killA = false
 getgenv().killSpeed = 1 
 getgenv().god = false
+getgenv().autoFarm = false
 
 local godmode 
 godmode = hookmetamethod(game, "__namecall", function(self, ...)  
@@ -18,13 +19,9 @@ godmode = hookmetamethod(game, "__namecall", function(self, ...)
   return godmode(self, ...)
 end)
 
-local tpOffset = Vector3.new(0, 4, 0)
 local function Tp(targ)
-  if not Hitbox then
-    return
-  end
   Hitbox.CanCollide = false
-  Hitbox.CFrame = targ.CFrame + tpOffset
+  Hitbox.CFrame = targ.CFrame
 end
 
 local function GetAttackable()
@@ -44,7 +41,11 @@ end
 
 local function aura()
 while getgenv().killA == true do
-	task.wait()
+	if killSpeed == 0 then
+		task.wait(0.0001)
+	else
+		task.wait(killSpeed)
+	end
 	local attackable = GetAttackable()
 	if #attackable > 0 then
 		Signal:FireServer("fireEvent", "playerWillUseBasicAttack", Player)
@@ -66,7 +67,25 @@ while getgenv().killA == true do
 end
 end
 
-
+local function autofarm()
+	distinctMobs = {}
+	while autoFarm == true do
+		local entities = game:GetService("Workspace").placeFolders.entityManifestCollection:GetChildren()
+		for i,entity in pairs(entities) do
+			if not table.find(distinctMobs, entity.Name then
+				table.insert(distinctMobs, entity.Name)
+			end
+			if entity.ClassName ~= "Model" and entity:FindFirstChild("health") and entity.health.Value > 0 and not entity:FindFirstChild("pet") then
+				while entity.health.Value > 0 or not entity:FindFirstChild("health") do
+					Tp(entity)
+					task.wait(0.2)
+				end
+			end
+		end
+		Hitbox.CanCollide = true
+	end
+end
+	
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/cat"))()
 local Window = Library:CreateWindow("PremReps Vesteria Custom", Vector2.new(300, 300), Enum.KeyCode.T)
 local autoTab = Window:CreateTab("AutoFarm")
@@ -76,6 +95,15 @@ KillAura:AddToggle("Kill Aura", false, function(bool)
 	getgenv().killA = bool
 	if bool then
 		aura()
+	end
+end)
+KillAura:AddSlider("Kill Speed", 0, 5, 20, 1, function(val)
+		killSpeed = val / 10
+end)
+KillAura:AddToggle("Auto Farm", false, function(bool)
+	autoFarm = bool
+	if bool then
+		autofarm()
 	end
 end)
 
