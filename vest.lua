@@ -20,6 +20,9 @@ godmode = hookmetamethod(game, "__namecall", function(self, ...)
 end)
 
 local function Tp(targ)
+  if not Hitbox then
+    return 
+  end 
   Hitbox.CanCollide = false
   Hitbox.CFrame = targ.CFrame
 end
