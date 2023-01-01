@@ -69,8 +69,8 @@ end
 local function autofarm()
 	distinctMobs = {}
 	while autoFarm == true do
-		if Hitbox:FindFirstChild("bodyGyro") then
-			Hitbox.bodyGyro.Parent = Character
+		if Hitbox:FindFirstChild("hitboxGyro") then
+			Hitbox.hitboxGyro.Parent = Character
 		end
 		local entities = game:GetService("Workspace").placeFolders.entityManifestCollection:GetChildren()
 		for i,entity in pairs(entities) do
@@ -88,8 +88,8 @@ local function autofarm()
 			end
 		end
 		Hitbox.CanCollide = true
-		if Character:FindFirstChild("bodyGyro") then
-			Character.bodyGyro.Parent = Hitbox
+		if Character:FindFirstChild("hitboxGyro") then
+			Character.hitboxGyro.Parent = Hitbox
 		end
 	end
 end
