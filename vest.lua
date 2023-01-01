@@ -20,9 +20,6 @@ godmode = hookmetamethod(game, "__namecall", function(self, ...)
 end)
 
 local function Tp(targ)
-  if not Hitbox then
-    return 
-  end 
   Hitbox.CanCollide = false
   Hitbox.CFrame = targ.CFrame
 end
@@ -72,6 +69,9 @@ end
 local function autofarm()
 	distinctMobs = {}
 	while autoFarm == true do
+		if Hitbox:FindFirstChild("bodyGyro") then
+			Hitbox.bodyGyro.Parent = Character
+		end
 		local entities = game:GetService("Workspace").placeFolders.entityManifestCollection:GetChildren()
 		for i,entity in pairs(entities) do
 			if not table.find(distinctMobs, entity.Name) then
@@ -88,6 +88,9 @@ local function autofarm()
 			end
 		end
 		Hitbox.CanCollide = true
+		if Character:FindFirstChild("bodyGyro") then
+			Character.bodyGyro.Parent = Hitbox
+		end
 	end
 end
 	
