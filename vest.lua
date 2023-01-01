@@ -22,7 +22,7 @@ end)
 
 local function Tp(targ)
   Hitbox.CanCollide = false
-  Hitbox.CFrame = targ.CFrame +Vector3.new(0,3,0).
+  Hitbox.CFrame = targ.CFrame +Vector3.new(0,3,0)
 end
 
 local function GetAttackable()
@@ -31,7 +31,6 @@ local function GetAttackable()
   for i, entity in pairs(entities) do
     if entity.ClassName ~= "Model" and entity:FindFirstChild("health") and entity.health.Value  > 0 and not entity:FindFirstChild("pet") then
       local Distance = (entity.Position - Hitbox.Position).Magnitude
-      print(Distance)
       if Distance < 15 then
         table.insert(attackable, entity)
       end
@@ -66,14 +65,22 @@ while getgenv().killA == true do
 	end     
 end
 end
-
+local function loopGyro(bodyG, ground)
+	task.spawn(function()
+		while autoFarm do
+			Hitbox.hitboxGyro.CFrame = bodyG
+			Hitbox.grounder.CFrame = ground
+			task.wait()
+		end
+	end)
+end	
+	
 local function autofarm()
 	distinctMobs = {}
-	while autoFarm == true do
-		if Hitbox:FindFirstChild("hitboxGyro") --[[and Hitbox:FindFirstChild("grounder")]] then
-			Hitbox.hitboxGyro.Parent = Character
-			--Hitbox.grounder.Parent = Character
-		end
+	local hGyro = Hitbox.hitboxGyro.CFrame
+	local hGround = Hitbox.grounder.CFrame
+	loopGyro(hGyro, hGround)
+	while autoFarm do
 		local entities = game:GetService("Workspace").placeFolders.entityManifestCollection:GetChildren()
 		for i,entity in pairs(entities) do
 			if not table.find(distinctMobs, entity.Name) then
@@ -90,10 +97,6 @@ local function autofarm()
 			end
 		end
 		Hitbox.CanCollide = true
-		if Character:FindFirstChild("hitboxGyro") --[[and Character:FindFirstChild("grounder")]] then
-			Character.hitboxGyro.Parent = Hitbox
-			--Character.grounder.Parent = Hitbox
-		end
 	end
 end
 	
