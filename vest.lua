@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Player = Players.LocalPlayer
+local PlayerName = Player.Name
 local Character = Player.Character
 local Hitbox = Character:WaitForChild("hitbox")
 local Signal = ReplicatedStorage:WaitForChild("signal")
@@ -21,7 +22,7 @@ end)
 
 local function Tp(targ)
   Hitbox.CanCollide = false
-  Hitbox.CFrame = targ.CFrame
+  Hitbox.CFrame = targ.CFrame +Vector3.new(0,3,0).
 end
 
 local function GetAttackable()
@@ -69,8 +70,9 @@ end
 local function autofarm()
 	distinctMobs = {}
 	while autoFarm == true do
-		if Hitbox:FindFirstChild("hitboxGyro") then
+		if Hitbox:FindFirstChild("hitboxGyro") --[[and Hitbox:FindFirstChild("grounder")]] then
 			Hitbox.hitboxGyro.Parent = Character
+			--Hitbox.grounder.Parent = Character
 		end
 		local entities = game:GetService("Workspace").placeFolders.entityManifestCollection:GetChildren()
 		for i,entity in pairs(entities) do
@@ -88,8 +90,9 @@ local function autofarm()
 			end
 		end
 		Hitbox.CanCollide = true
-		if Character:FindFirstChild("hitboxGyro") then
+		if Character:FindFirstChild("hitboxGyro") --[[and Character:FindFirstChild("grounder")]] then
 			Character.hitboxGyro.Parent = Hitbox
+			--Character.grounder.Parent = Hitbox
 		end
 	end
 end
