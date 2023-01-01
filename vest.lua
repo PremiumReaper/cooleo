@@ -20,6 +20,15 @@ godmode = hookmetamethod(game, "__namecall", function(self, ...)
   return godmode(self, ...)
 end)
 
+local antigyro
+antigyro = hookmetamethod(game, "__namecall", function(self, ...)
+	local args = {...}
+	if getnamecallmethod() == "FireServer" and args[1] == "replicateClientStateChanged"
+		return
+	end
+	return antigyro(self, ...)
+end)
+
 local function Tp(targ)
   Hitbox.CanCollide = false
   Hitbox.CFrame = targ.CFrame +Vector3.new(0,3,0)
@@ -125,4 +134,3 @@ local playerTab = autoTab:CreateSector("Player", "right")
 playerTab:AddToggle("Godmode", false, function(bool)
 	getgenv().god = bool
 end)
-
