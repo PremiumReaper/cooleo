@@ -63,7 +63,6 @@ while getgenv().killA == true do
 			    }
 		      }
 		  Signal:FireServer("playerRequest_damageEntity_batch", ohTable2)
-		  --task.wait(getgenv().killSpeed) 
 		  end
 		end
 	end     
