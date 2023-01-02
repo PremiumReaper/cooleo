@@ -1,0 +1,2023 @@
+-- Decompiled with the Synapse X Luau decompiler.
+
+local v1 = nil;
+local l__LocalPlayer__2 = game.Players.LocalPlayer;
+local v3 = math.floor(game:GetService("StarterPlayer").CameraMaxZoomDistance * 1.25);
+local l__assets__4 = script.Parent.Parent:WaitForChild("assets");
+local u1 = {};
+local u2 = 16;
+local l__UserInputService__5 = game:GetService("UserInputService");
+local v6 = require(game.ReplicatedStorage:WaitForChild("modules"));
+local v7 = v6.load("placeSetup");
+local v8 = v6.load("network");
+local v9 = v6.load("client_utilities");
+local v10 = v6.load("tween");
+local v11 = v6.load("utilities");
+local v12 = v6.load("terrainUtil");
+local v13 = v6.load("damage");
+local v14 = v6.load("configuration");
+local v15 = v6.load("tag");
+local v16 = require(game.ReplicatedStorage:WaitForChild("abilityLookup"));
+local u3 = nil;
+v8:create("signal_menuFocusChanged", "BindableEvent", "Event", function(p1)
+	u3 = p1;
+end);
+local v17 = v7.awaitPlaceFolder("entityRenderCollection");
+local v18 = v7.awaitPlaceFolder("entityManifestCollection");
+local v19 = { v7.getPlaceFoldersFolder() };
+local l__UserInputService__20 = game:GetService("UserInputService");
+local v21 = require(game.Players.LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("repo"):WaitForChild("animationInterface"));
+local v22 = nil;
+local v23 = nil;
+while true do
+	wait();
+	v1 = l__LocalPlayer__2.PlayerGui:FindFirstChild("gameUI");
+	if v1 then
+		v22 = v1:FindFirstChild("input");
+		v23 = v1:FindFirstChild("focus");
+	end;
+	if v1 and v22 and v23 then
+		break;
+	end;
+end;
+local v24 = require(v1.menuButtons.menuButtons);
+local v25 = require(game.ReplicatedStorage.itemData);
+local u4 = false;
+local u5 = 1;
+local l__TweenService__26 = game:GetService("TweenService");
+local v27 = TweenInfo.new(0.3333333333333333, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0, false, 0);
+local v28 = Instance.new("NumberValue");
+v28.Name = "sprintFOV";
+v28.Parent = script;
+local u6 = 2 * math.pi;
+local u7 = nil;
+v8:create("mobileMovementDirectionChanged", "BindableEvent", "Event", function(p2)
+	u7 = p2;
+end);
+local u8 = 0;
+local u9 = nil;
+local u10 = false;
+local u11 = false;
+local u12 = false;
+local u13 = false;
+local u14 = nil;
+local u15 = true;
+local u16 = true;
+local u17 = 0;
+local u18 = nil;
+local u19 = nil;
+local l__Camera__20 = workspace.Camera;
+local u21 = {};
+local u22 = 1;
+local u23 = {
+	isSprinting = false, 
+	isInAir = false, 
+	isMoving = false, 
+	isJumping = false, 
+	isSitting = false, 
+	isExhausted = false, 
+	isDoubleJumping = false, 
+	isFalling = false, 
+	isRotating = false, 
+	isFishing = false, 
+	isGettingUp = false, 
+	isSwimming = false, 
+	isHarvesting = false
+};
+local u24 = nil;
+local u25 = false;
+local u26 = 0;
+local l__RunService__29 = game:GetService("RunService");
+local u27 = {
+	dance = true, 
+	dance2 = true, 
+	dance3 = true, 
+	["oh yea"] = true, 
+	hype = true, 
+	sit = true, 
+	wave = true, 
+	point = true, 
+	beg = true, 
+	flex = true, 
+	handstand = true, 
+	tadaa = true, 
+	jumps = true, 
+	guitar = true, 
+	panic = true, 
+	cheer = true, 
+	pushups = true, 
+	spinny = true
+};
+local u28 = false;
+local u29 = "";
+local u30 = false;
+v8:create("playerRequest_performEmote", "BindableFunction", "OnInvoke", function(p3)
+	if not u23.isSprinting and not u23.isInAir and not u23.isMoving and not u23.isJumping and not u23.isSitting and not u23.isExhausted and not u23.isDoubleJumping and not u23.isFalling and not u23.isFishing and not u23.isHarvesting and not u23.isGettingUp and not u23.isSwimming then
+		if v15.get(l__LocalPlayer__2, "morph") or l__LocalPlayer__2.Character and v15.get(l__LocalPlayer__2.Character.PrimaryPart, "morph") then
+			return false;
+		else
+			local v30 = false;
+			p3 = string.lower(p3);
+			for v31, v32 in pairs(v8:invoke("getCacheValueByNameTag", "globalData").emotes) do
+				if p3 == v32 then
+					v30 = true;
+				end;
+			end;
+			if u27[p3] then
+				v30 = true;
+			end;
+			if v30 and not u28 then
+				if u29 ~= p3 then
+					u29 = p3;
+					u30 = true;
+					spawn(function()
+						u28 = true;
+						wait(1);
+						u28 = false;
+					end);
+					l__LocalPlayer__2.Character.PrimaryPart.state.Value = "idling";
+					v8:fireServer("replicateClientStateChanged", "idling");
+					v21:replicatePlayerAnimationSequence("emoteAnimations", p3, nil, {
+						dance = true
+					});
+					return true;
+				else
+					return;
+				end;
+			elseif u28 then
+				return false, "Emote on cooldown.";
+			else
+				return false, "Cannot perform invalid emote.";
+			end;
+		end;
+	end;
+	return false;
+end);
+v8:create("endEmote", "BindableEvent", "Event", function()
+	if u30 then
+		u29 = "";
+		u30 = false;
+	end;
+end);
+local function u31(p4)
+	if u25 then
+		return;
+	end;
+	v8:fire("stopChannels", "sprint");
+	u25 = true;
+	v10(v28, { "Value" }, 10, 0.5);
+	if not u23.isInAir and u24 and u24:FindFirstChild("entity") then
+		u24.entity.RightFoot.ParticleEmitter.Enabled = true;
+		u24.entity.LeftFoot.ParticleEmitter.Enabled = true;
+	end;
+	u26 = tick();
+end;
+local function u32()
+	u25 = false;
+	v10(v28, { "Value" }, 0, 0.5);
+	if u24 and u24:FindFirstChild("entity") then
+		u24.entity.RightFoot.ParticleEmitter.Enabled = false;
+		u24.entity.LeftFoot.ParticleEmitter.Enabled = false;
+	end;
+end;
+local u33 = false;
+local l__wind__33 = l__assets__4.wind;
+l__wind__33.Volume = 0;
+l__wind__33:Play();
+local v34 = Vector3.new();
+local v35 = Vector3.new();
+local function v36(p5)
+	local l__Character__37 = l__LocalPlayer__2.Character;
+	if not l__Character__37 then
+		return false;
+	end;
+	local l__PrimaryPart__38 = l__Character__37.PrimaryPart;
+	if not l__PrimaryPart__38 then
+		return false;
+	end;
+	local l__statusEffectsV2__39 = l__PrimaryPart__38:FindFirstChild("statusEffectsV2");
+	if not l__statusEffectsV2__39 then
+		return false;
+	end;
+	local v40, v41 = v11.safeJSONDecode(l__statusEffectsV2__39.Value);
+	if not v40 then
+		return false;
+	end;
+	for v42, v43 in pairs(v41) do
+		if v43.statusEffectType == p5 then
+			return true;
+		end;
+	end;
+	return false;
+end;
+v8:create("doesPlayerHaveStatusEffect", "BindableFunction", "OnInvoke", v36);
+v8:create("isCharacterStunned", "BindableFunction", "OnInvoke", function()
+	return v36("stunned");
+end);
+local u34 = false;
+function set_sprinting(p6)
+	if not u33 then
+
+	else
+		v8:invoke("setCharacterMovementState", "isSprinting", false);
+		return;
+	end;
+	if u16 then
+		if not u34 then
+			if p6 then
+
+			else
+				v8:invoke("setCharacterMovementState", "isSprinting", false);
+				return;
+			end;
+		end;
+	else
+		v8:invoke("setCharacterMovementState", "isSprinting", false);
+		return;
+	end;
+	v8:invoke("setCharacterMovementState", "isSprinting", true);
+	return true;
+end;
+function toggle_sprint(p7)
+	if p7 == nil then
+		p7 = not u34;
+	end;
+	u34 = not (not p7);
+	set_sprinting(p7);
+end;
+local u35 = {};
+local u36 = v35;
+local function u37(p8, p9, ...)
+	if u23[p8] ~= nil and u23[p8] ~= p9 and l__LocalPlayer__2.Character and l__LocalPlayer__2.Character.PrimaryPart and l__LocalPlayer__2.Character.PrimaryPart.state.Value ~= "dead" then
+		u30 = false;
+		u29 = "";
+		if p8 == "isSprinting" and not v8:invoke("getIsCurrentlyConsuming") then
+			local v44 = nil;
+			local v45 = nil;
+			local v46 = nil;
+			local v47 = nil;
+			local v48 = nil;
+			local v49 = nil;
+			local v50 = nil;
+			local v51 = nil;
+			local v52 = nil;
+			local v53 = nil;
+			local v54 = nil;
+			local v55 = nil;
+			local v56 = nil;
+			local v57 = nil;
+			local v58 = nil;
+			local v59 = nil;
+			local v60 = nil;
+			local v61 = nil;
+			local v62 = nil;
+			local v63 = nil;
+			local v64 = nil;
+			local v65 = nil;
+			local v66 = nil;
+			local v67 = nil;
+			if not u23.isExhausted then
+				if u23.isMoving then
+					if not u23[p8] and p9 then
+						u31();
+					elseif u23[p8] and not p9 then
+						u32();
+					end;
+				elseif u23[p8] and not p9 then
+					u32();
+				end;
+				v44 = u23;
+				v45 = v44;
+				v46 = p8;
+				v47 = p9;
+				v45[v46] = v47;
+				v48 = l__LocalPlayer__2;
+				v49 = "Character";
+				v50 = v48;
+				v51 = v49;
+				local v68 = v50[v51];
+				v52 = v68;
+				if v52 and l__LocalPlayer__2.Character.PrimaryPart then
+					if not u23.isGettingUp then
+						if not u23.isSwimming then
+							if not u23.isFishing then
+								if not u23.isSitting then
+									if not u23.isFalling then
+										if not u23.isJumping then
+											if u23.isMoving or u23.isRotating then
+												if u23.isSprinting and not u33 then
+													l__LocalPlayer__2.Character.PrimaryPart.state.Value = "sprinting";
+													v8:fireServer("replicateClientStateChanged", "sprinting");
+												elseif u23.isExhausted then
+													l__LocalPlayer__2.Character.PrimaryPart.state.Value = "walking_exhausted";
+													v8:fireServer("replicateClientStateChanged", "walking_exhausted");
+												else
+													l__LocalPlayer__2.Character.PrimaryPart.state.Value = "walking";
+													v8:fireServer("replicateClientStateChanged", "walking");
+												end;
+											elseif u23.isExhausted then
+												l__LocalPlayer__2.Character.PrimaryPart.state.Value = "idling_exhausted";
+												v8:fireServer("replicateClientStateChanged", "idling_exhausted");
+											else
+												l__LocalPlayer__2.Character.PrimaryPart.state.Value = "idling";
+												v8:fireServer("replicateClientStateChanged", "idling", "kicking");
+											end;
+										elseif not u23.isDoubleJumping then
+											l__LocalPlayer__2.Character.PrimaryPart.state.Value = "jumping";
+											v8:fireServer("replicateClientStateChanged", "jumping");
+										else
+											l__LocalPlayer__2.Character.PrimaryPart.state.Value = "double_jumping";
+											v8:fireServer("replicateClientStateChanged", "double_jumping");
+										end;
+									else
+										l__LocalPlayer__2.Character.PrimaryPart.state.Value = "falling";
+										v8:fireServer("replicateClientStateChanged", "falling");
+									end;
+								else
+									l__LocalPlayer__2.Character.PrimaryPart.state.Value = "sitting";
+									v8:fireServer("replicateClientStateChanged", "sitting", nil, ...);
+								end;
+							else
+								l__LocalPlayer__2.Character.PrimaryPart.state.Value = "fishing";
+								v8:fireServer("replicateClientStateChanged", "fishing");
+							end;
+						else
+							l__LocalPlayer__2.Character.PrimaryPart.state.Value = "swimming";
+							v8:fireServer("replicateClientStateChanged", "swimming");
+						end;
+					else
+						l__LocalPlayer__2.Character.PrimaryPart.state.Value = "gettingUp";
+						v8:fireServer("replicateClientStateChanged", "gettingUp", nil, ...);
+					end;
+				end;
+				local v69 = v8;
+				v58 = "characterStateChanged";
+				v53 = p8;
+				v59 = v53;
+				v54 = p9;
+				v60 = v54;
+				v66 = ...;
+				local v70 = "fire";
+				v55 = v69;
+				local v71 = v55;
+				v56 = v69;
+				v57 = v70;
+				local v72 = v56[v57];
+				v61 = v72;
+				v62 = v71;
+				v63 = v58;
+				v64 = v59;
+				v65 = v60;
+				v61(v62, v63, v64, v65, v66);
+				local v73 = true;
+				v67 = v73;
+				return v67;
+			elseif p8 == "isSprinting" and (v8:invoke("getIsCurrentlyConsuming") or u23.isExhausted) then
+				return;
+			else
+				if p8 == "isMoving" and not u23.isExhausted then
+					if u23.isSprinting and not u25 then
+						u31(true);
+					elseif not u23.isSprinting and u25 then
+						u32(true);
+					end;
+				elseif p8 == "isGettingUp" and u23.isSprinting then
+					u23.isSprinting = false;
+					u32(true);
+				end;
+				v44 = u23;
+				v45 = v44;
+				v46 = p8;
+				v47 = p9;
+				v45[v46] = v47;
+				v48 = l__LocalPlayer__2;
+				v49 = "Character";
+				v50 = v48;
+				v51 = v49;
+				v68 = v50[v51];
+				v52 = v68;
+				if v52 and l__LocalPlayer__2.Character.PrimaryPart then
+					if not u23.isGettingUp then
+						if not u23.isSwimming then
+							if not u23.isFishing then
+								if not u23.isSitting then
+									if not u23.isFalling then
+										if not u23.isJumping then
+											if u23.isMoving or u23.isRotating then
+												if u23.isSprinting and not u33 then
+													l__LocalPlayer__2.Character.PrimaryPart.state.Value = "sprinting";
+													v8:fireServer("replicateClientStateChanged", "sprinting");
+												elseif u23.isExhausted then
+													l__LocalPlayer__2.Character.PrimaryPart.state.Value = "walking_exhausted";
+													v8:fireServer("replicateClientStateChanged", "walking_exhausted");
+												else
+													l__LocalPlayer__2.Character.PrimaryPart.state.Value = "walking";
+													v8:fireServer("replicateClientStateChanged", "walking");
+												end;
+											elseif u23.isExhausted then
+												l__LocalPlayer__2.Character.PrimaryPart.state.Value = "idling_exhausted";
+												v8:fireServer("replicateClientStateChanged", "idling_exhausted");
+											else
+												l__LocalPlayer__2.Character.PrimaryPart.state.Value = "idling";
+												v8:fireServer("replicateClientStateChanged", "idling", "kicking");
+											end;
+										elseif not u23.isDoubleJumping then
+											l__LocalPlayer__2.Character.PrimaryPart.state.Value = "jumping";
+											v8:fireServer("replicateClientStateChanged", "jumping");
+										else
+											l__LocalPlayer__2.Character.PrimaryPart.state.Value = "double_jumping";
+											v8:fireServer("replicateClientStateChanged", "double_jumping");
+										end;
+									else
+										l__LocalPlayer__2.Character.PrimaryPart.state.Value = "falling";
+										v8:fireServer("replicateClientStateChanged", "falling");
+									end;
+								else
+									l__LocalPlayer__2.Character.PrimaryPart.state.Value = "sitting";
+									v8:fireServer("replicateClientStateChanged", "sitting", nil, ...);
+								end;
+							else
+								l__LocalPlayer__2.Character.PrimaryPart.state.Value = "fishing";
+								v8:fireServer("replicateClientStateChanged", "fishing");
+							end;
+						else
+							l__LocalPlayer__2.Character.PrimaryPart.state.Value = "swimming";
+							v8:fireServer("replicateClientStateChanged", "swimming");
+						end;
+					else
+						l__LocalPlayer__2.Character.PrimaryPart.state.Value = "gettingUp";
+						v8:fireServer("replicateClientStateChanged", "gettingUp", nil, ...);
+					end;
+				end;
+				v69 = v8;
+				v58 = "characterStateChanged";
+				v53 = p8;
+				v59 = v53;
+				v54 = p9;
+				v60 = v54;
+				v66 = ...;
+				v70 = "fire";
+				v55 = v69;
+				v71 = v55;
+				v56 = v69;
+				v57 = v70;
+				v72 = v56[v57];
+				v61 = v72;
+				v62 = v71;
+				v63 = v58;
+				v64 = v59;
+				v65 = v60;
+				v61(v62, v63, v64, v65, v66);
+				v73 = true;
+				v67 = v73;
+				return v67;
+			end;
+		elseif p8 == "isSprinting" and (v8:invoke("getIsCurrentlyConsuming") or u23.isExhausted) then
+			return;
+		else
+			if p8 == "isMoving" and not u23.isExhausted then
+				if u23.isSprinting and not u25 then
+					u31(true);
+				elseif not u23.isSprinting and u25 then
+					u32(true);
+				end;
+			elseif p8 == "isGettingUp" and u23.isSprinting then
+				u23.isSprinting = false;
+				u32(true);
+			end;
+			v44 = u23;
+			v45 = v44;
+			v46 = p8;
+			v47 = p9;
+			v45[v46] = v47;
+			v48 = l__LocalPlayer__2;
+			v49 = "Character";
+			v50 = v48;
+			v51 = v49;
+			v68 = v50[v51];
+			v52 = v68;
+			if v52 and l__LocalPlayer__2.Character.PrimaryPart then
+				if not u23.isGettingUp then
+					if not u23.isSwimming then
+						if not u23.isFishing then
+							if not u23.isSitting then
+								if not u23.isFalling then
+									if not u23.isJumping then
+										if u23.isMoving or u23.isRotating then
+											if u23.isSprinting and not u33 then
+												l__LocalPlayer__2.Character.PrimaryPart.state.Value = "sprinting";
+												v8:fireServer("replicateClientStateChanged", "sprinting");
+											elseif u23.isExhausted then
+												l__LocalPlayer__2.Character.PrimaryPart.state.Value = "walking_exhausted";
+												v8:fireServer("replicateClientStateChanged", "walking_exhausted");
+											else
+												l__LocalPlayer__2.Character.PrimaryPart.state.Value = "walking";
+												v8:fireServer("replicateClientStateChanged", "walking");
+											end;
+										elseif u23.isExhausted then
+											l__LocalPlayer__2.Character.PrimaryPart.state.Value = "idling_exhausted";
+											v8:fireServer("replicateClientStateChanged", "idling_exhausted");
+										else
+											l__LocalPlayer__2.Character.PrimaryPart.state.Value = "idling";
+											v8:fireServer("replicateClientStateChanged", "idling", "kicking");
+										end;
+									elseif not u23.isDoubleJumping then
+										l__LocalPlayer__2.Character.PrimaryPart.state.Value = "jumping";
+										v8:fireServer("replicateClientStateChanged", "jumping");
+									else
+										l__LocalPlayer__2.Character.PrimaryPart.state.Value = "double_jumping";
+										v8:fireServer("replicateClientStateChanged", "double_jumping");
+									end;
+								else
+									l__LocalPlayer__2.Character.PrimaryPart.state.Value = "falling";
+									v8:fireServer("replicateClientStateChanged", "falling");
+								end;
+							else
+								l__LocalPlayer__2.Character.PrimaryPart.state.Value = "sitting";
+								v8:fireServer("replicateClientStateChanged", "sitting", nil, ...);
+							end;
+						else
+							l__LocalPlayer__2.Character.PrimaryPart.state.Value = "fishing";
+							v8:fireServer("replicateClientStateChanged", "fishing");
+						end;
+					else
+						l__LocalPlayer__2.Character.PrimaryPart.state.Value = "swimming";
+						v8:fireServer("replicateClientStateChanged", "swimming");
+					end;
+				else
+					l__LocalPlayer__2.Character.PrimaryPart.state.Value = "gettingUp";
+					v8:fireServer("replicateClientStateChanged", "gettingUp", nil, ...);
+				end;
+			end;
+			v69 = v8;
+			v58 = "characterStateChanged";
+			v53 = p8;
+			v59 = v53;
+			v54 = p9;
+			v60 = v54;
+			v66 = ...;
+			v70 = "fire";
+			v55 = v69;
+			v71 = v55;
+			v56 = v69;
+			v57 = v70;
+			v72 = v56[v57];
+			v61 = v72;
+			v62 = v71;
+			v63 = v58;
+			v64 = v59;
+			v65 = v60;
+			v61(v62, v63, v64, v65, v66);
+			v73 = true;
+			v67 = v73;
+			return v67;
+		end;
+	end;
+end;
+local u38 = nil;
+local u39 = v34;
+local function v74(p10, p11)
+	u35.xboxArrested = nil;
+	if p10 then
+		u33 = true;
+		u36 = Vector3.new();
+		if u23.isSprinting then
+			u32(true);
+		end;
+		u37("isMoving", false);
+		u37("isSprinting", false);
+		u37("isSitting", false);
+		u37("isRotating", false);
+		if p11 then
+			u38 = p11;
+			u39 = Vector3.new();
+			l__LocalPlayer__2.Character:SetPrimaryPartCFrame(p11);
+			local v75 = l__LocalPlayer__2.Character and l__LocalPlayer__2.Character.PrimaryPart;
+			if v75 then
+				local l__grounder__76 = v75.grounder;
+				l__grounder__76.MaxForce = Vector3.new(100000, 100000, 100000);
+				v75.hitboxVelocity.MaxForce = Vector3.new(0, 0, 0);
+				v75.hitboxGyro.CFrame = u38;
+				l__grounder__76.Position = u38.Position;
+				return;
+			end;
+		end;
+	else
+		u33 = false;
+		u38 = nil;
+		if l__UserInputService__20:IsKeyDown(Enum.KeyCode.LeftShift) then
+			set_sprinting(true);
+		end;
+	end;
+end;
+v8:create("isCharacterArrested", "BindableFunction", "OnInvoke", function()
+	return u33;
+end);
+v8:create("setCharacterArrested", "BindableFunction", "OnInvoke", v74);
+local v77 = {};
+local u40 = nil;
+function v77.applyJoltVelocity(p12, p13)
+	if u40 then
+		p13 = p13 * Vector3.new(1, 0.5, 1);
+	end;
+	u39 = u39 + p13;
+end;
+v8:create("applyJoltVelocityToCharacter", "BindableEvent", "Event", function(p14)
+	v77:applyJoltVelocity(p14);
+end);
+local v78 = Instance.new("BlurEffect");
+v78.Size = 4;
+v78.Enabled = false;
+v78.Parent = game.Lighting;
+local v79 = Instance.new("ColorCorrectionEffect");
+v79.Saturation = 0.35;
+v79.Contrast = 0.05;
+v79.Enabled = false;
+v79.Parent = game.Lighting;
+local v80 = Instance.new("BloomEffect");
+v80.Enabled = false;
+v80.Parent = game.Lighting;
+local u41 = 0;
+local u42 = nil;
+local l__AmbientReverb__43 = game.SoundService.AmbientReverb;
+local u44 = 500;
+function v77.stepCurrentVelocity(p15, p16)
+	local v81 = l__LocalPlayer__2.Character and l__LocalPlayer__2.Character.PrimaryPart;
+	local v82 = false;
+	local v83 = v36("heat exhausted");
+	local v84 = 0;
+	if _G.belowMaterial and _G.belowMaterial == Enum.Material.Cobblestone then
+		v84 = 2;
+	elseif (not u23.isSprinting or not (v81.Velocity.Magnitude > 0.2)) and not u23.isExhausted and not u23.isJumping and not u23.isDoubleJumping and tick() - u41 > 1 then
+		v84 = 1;
+		if v83 then
+			v84 = 0.1;
+		end;
+	end;
+	if v84 > 0 then
+
+	end;
+	if v83 then
+
+	end;
+	if v81.health.Value <= 0 or v81.state.Value == "dead" then
+		if u23.isExhausted then
+			u37("isExhausted", false);
+		end;
+	elseif v81.stamina.Value <= 0 and not u23.isExhausted then
+		u37("isSprinting", false);
+		u37("isExhausted", true);
+		v8:fire("stopChannels", "exhausted");
+		spawn(function()
+			wait(2);
+			v81.stamina.Value = 0.01;
+			u37("isExhausted", false);
+		end);
+		v8:fireServer("playerWasExhausted");
+	end;
+	local v85 = 70 + v28.Value + math.clamp(v11.magnitude(v81.Velocity) / 5 - 10, 0, 40);
+	if _G.belowMaterial and _G.belowMaterial == Enum.Material.Cobblestone and u23.isSprinting then
+		v85 = v85 + 5;
+	end;
+	local l__FieldOfView__86 = workspace.CurrentCamera.FieldOfView;
+	if v85 ~= l__FieldOfView__86 then
+		local v87 = nil;
+		v87 = math.abs(v85 - l__FieldOfView__86) * p16 * 3 + 0.1;
+		if l__FieldOfView__86 < v85 then
+			if l__FieldOfView__86 + v87 < v85 then
+				local v88 = l__FieldOfView__86 + v87;
+			else
+				v88 = v85;
+			end;
+		elseif v85 < l__FieldOfView__86 - v87 then
+			v88 = l__FieldOfView__86 - v87;
+		else
+			v88 = v85;
+		end;
+		if not workspace.CurrentCamera:FindFirstChild("overridden") then
+			workspace.CurrentCamera.FieldOfView = v88;
+		end;
+	end;
+	debug.profilebegin("underWaterCheck");
+	if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character.PrimaryPart then
+		if v12.isPointUnderwater(game.Players.LocalPlayer.Character.PrimaryPart.Position) then
+			if not u40 then
+				u39 = u39 / 5;
+				u40 = true;
+				if u24 and u24:FindFirstChild("entity") and u24.entity:FindFirstChild("Head") and u24.entity.Head:FindFirstChild("MouthAttachment") then
+					u24.entity.Head.MouthAttachment.bubbleParticles.Enabled = true;
+				end;
+				local l__water_in__89 = game.ReplicatedStorage.sounds:FindFirstChild("water_in");
+				if l__water_in__89 then
+					local v90 = l__water_in__89:clone();
+					v90.Parent = game.Players.LocalPlayer.Character.PrimaryPart;
+					v90.PlaybackSpeed = math.random(105, 120) / 100;
+					v90:Play();
+					game.Debris:AddItem(v90, 5);
+				end;
+				if u23.isJumping then
+					u37("isJumping", false);
+					u37("isDoubleJumping", false);
+				end;
+				u37("isFalling", false);
+				if (not (not u10) or not (not u13) or not (not u12) or u11) and not u23.isSwimming then
+					u37("isSwimming", true);
+				end;
+			end;
+		elseif u40 and not v12.isPointUnderwater(game.Players.LocalPlayer.Character.PrimaryPart.Position - Vector3.new(0, 0.5, 0)) then
+			if u40 and u24 and u24:FindFirstChild("entity") and u24.entity:FindFirstChild("Head") and u24.entity.Head:FindFirstChild("MouthAttachment") then
+				u24.entity.Head.MouthAttachment.bubbleParticles.Enabled = false;
+			end;
+			u40 = false;
+			u37("isSwimming", false);
+			u37("isJumping", false);
+			u37("isDoubleJumping", false);
+			perform_forceJump();
+			local l__water_out__91 = game.ReplicatedStorage.sounds:FindFirstChild("water_out");
+			if l__water_out__91 then
+				local v92 = l__water_out__91:clone();
+				v92.Parent = game.Players.LocalPlayer.Character.PrimaryPart;
+				v92.PlaybackSpeed = math.random(105, 120) / 100;
+				v92:Play();
+				game.Debris:AddItem(v92, 5);
+			end;
+		end;
+	end;
+	if v12.isPointUnderwater(workspace.CurrentCamera.CFrame.Position) then
+		if not u42 then
+			u42 = true;
+			game.SoundService.AmbientReverb = "UnderWater";
+			v78.Enabled = true;
+			v79.Enabled = true;
+			v80.Enabled = true;
+		end;
+	elseif u42 and not v12.isPointUnderwater(workspace.CurrentCamera.CFrame.Position - Vector3.new(0, 0.5, 0)) then
+		u42 = false;
+		game.SoundService.AmbientReverb = l__AmbientReverb__43;
+		v78.Enabled = false;
+		v79.Enabled = false;
+		v80.Enabled = false;
+	end;
+	debug.profileend();
+	if (not u23.isSwimming or game.ReplicatedStorage:FindFirstChild("underwaterForce")) and (v11.magnitude(u39) > 0 or u23.isInAir) then
+		local v93 = u39 + u36;
+		local l__Velocity__94 = v81.Velocity;
+		local v95 = math.abs(v93.X - l__Velocity__94.X) * p16 * 3;
+		local v96 = math.abs(v93.Z - l__Velocity__94.Z) * p16 * 3;
+		local v97 = Vector3.new(u39.X, 0, u39.Z);
+		local v98 = Vector3.new(0, workspace.Gravity * p16, 0);
+		if u40 then
+			v98 = v98 / 5;
+			if game.ReplicatedStorage:FindFirstChild("underwaterForce") then
+				v98 = v98 * game.ReplicatedStorage.underwaterForce.Value;
+			end;
+		end;
+		if u23.isInAir then
+			if l__wind__33.Volume < math.clamp(l__Velocity__94.Y / 2500, 0, 2) then
+				l__wind__33.Volume = l__wind__33.Volume + 0.01;
+			else
+				l__wind__33.Volume = l__wind__33.Volume - 0.01;
+			end;
+			local v99 = 20 * p16 * (math.abs(u39.X) / v11.magnitude(v97)) + v95;
+			local v100 = 20 * p16 * (math.abs(u39.Z) / v11.magnitude(v97)) + v96;
+			if v99 < math.abs(u39.X) then
+				u39 = Vector3.new(u39.X - v99 * math.sign(u39.X), u39.Y, u39.Z);
+			else
+				u39 = Vector3.new(0, u39.Y, u39.Z);
+			end;
+			if v100 < math.abs(u39.Z) then
+				u39 = Vector3.new(u39.X, u39.Y, u39.Z - v100 * math.sign(u39.Z));
+			else
+				u39 = Vector3.new(u39.X, u39.Y, 0);
+			end;
+			u39 = u39 - v98;
+		else
+			if l__wind__33.Volume > 0 then
+				l__wind__33.Volume = l__wind__33.Volume - 0.02;
+			end;
+			local v101 = u44 * p16 * (math.abs(u39.X) / v11.magnitude(v97)) + v95;
+			local v102 = u44 * p16 * (math.abs(u39.Z) / v11.magnitude(v97)) + v96;
+			if v101 > 0 then
+				if v101 < math.abs(u39.X) then
+					u39 = Vector3.new(u39.X - v101 * math.sign(u39.X), u39.Y, u39.Z);
+					v82 = true;
+				else
+					u39 = Vector3.new(0, u39.Y, u39.Z);
+				end;
+			end;
+			if v102 > 0 then
+				if v102 < math.abs(u39.Z) then
+					u39 = Vector3.new(u39.X, u39.Y, u39.Z - v102 * math.sign(u39.Z));
+					v82 = true;
+				else
+					u39 = Vector3.new(u39.X, u39.Y, 0);
+				end;
+			end;
+			if v98.Y <= u39.Y then
+				u39 = u39 - v98;
+			else
+				u39 = Vector3.new(u39.X, 0, u39.Z);
+			end;
+		end;
+	elseif l__wind__33.Volume > 0 then
+		l__wind__33.Volume = l__wind__33.Volume - 0.02;
+	end;
+	if u24 and u24:FindFirstChild("entity") then
+		if v82 then
+			local v103 = math.clamp(v11.magnitude(u39) / 3, 5, 60);
+			u24.entity.RightFoot.smoke.Rate = v103;
+			u24.entity.LeftFoot.smoke.Rate = v103;
+		end;
+		u24.entity.RightFoot.smoke.Enabled = v82;
+		u24.entity.LeftFoot.smoke.Enabled = v82;
+	end;
+	local v104 = 1;
+	if u40 then
+		v104 = 1;
+	end;
+	if l__LocalPlayer__2.Character and l__LocalPlayer__2.Character.PrimaryPart and l__LocalPlayer__2.Character.PrimaryPart.state.Value == "dead" then
+		u36 = Vector3.new();
+	end;
+	if not u40 or not u23.isSwimming then
+		return (u36 + u39) * v104;
+	end;
+	u39 = Vector3.new();
+	if u1.swimSpeed then
+		v104 = v104 * u1.swimSpeed;
+	end;
+	if not u23.isJumping then
+		return u36 * v104;
+	end;
+	return u36 * v104 + Vector3.new(0, 16 * (u1.swimmingUpwardsVelocityMultiplier and 1), 0);
+end;
+local u45 = v22;
+local u46 = v23;
+local u47 = v24;
+local u48 = nil;
+local function u49()
+	local v105 = nil;
+	local v106 = nil;
+	local v107 = nil;
+	local v108 = nil;
+	local v109 = nil;
+	local v110 = nil;
+	local v111 = nil;
+	local v112 = nil;
+	local v113 = nil;
+	local v114 = nil;
+	local v115 = nil;
+	local v116 = nil;
+	local v117 = nil;
+	local v118 = nil;
+	local v119 = nil;
+	local v120 = nil;
+	local v121 = nil;
+	local v122 = nil;
+	local v123 = nil;
+	local v124 = nil;
+	local v125 = nil;
+	local v126 = nil;
+	local v127 = nil;
+	local v128 = nil;
+	local v129 = nil;
+	local v130 = nil;
+	local v131 = nil;
+	local v132 = nil;
+	local v133 = nil;
+	local v134 = nil;
+	local v135 = nil;
+	local v136 = nil;
+	local v137 = nil;
+	local v138 = nil;
+	local v139 = nil;
+	local v140 = nil;
+	local v141 = nil;
+	local v142 = nil;
+	local v143 = nil;
+	local v144 = nil;
+	local v145 = nil;
+	local v146 = nil;
+	local v147 = nil;
+	local v148 = nil;
+	local v149 = nil;
+	local v150 = nil;
+	if u10 and (not (not u11) and not (not u12) and not u13 or not u13 and not u11 and not u12) then
+		v150 = 0;
+	elseif u10 and u11 and not u13 and not u12 then
+		v150 = math.pi / 4;
+	elseif u11 and (not (not u10) and not (not u13) and not u12 or not u10 and not u13 and not u12) then
+		v150 = math.pi / 2;
+	elseif u13 and u11 and not u10 and not u12 then
+		v150 = 3 * math.pi / 4;
+	elseif u13 and (not (not u11) and not (not u12) and not u10 or not u10 and not u12 and not u11) then
+		v150 = math.pi;
+	elseif u13 and u12 and not u11 and not u10 then
+		v150 = 5 * math.pi / 4;
+	elseif u12 and (not (not u10) and not (not u13) and not u11 or not u11 and not u10 and not u13) then
+		v150 = 3 * math.pi / 2;
+	elseif u12 and u10 and not u11 and not u13 then
+		v150 = 7 * math.pi / 4;
+	end;
+	if u7 then
+		if u7.magnitude > 0.1 then
+			u14 = u7;
+			return (math.atan2(-u7.Y, u7.X) - math.pi / 2) % u6;
+		else
+			u14 = nil;
+			return nil;
+		end;
+	end;
+	if v150 then
+		u14 = nil;
+		return v150;
+	end;
+	local v151 = l__UserInputService__5:GetGamepadState(Enum.UserInputType.Gamepad1);
+	if v151 then
+		local v152, v153, v154 = pairs(v151);
+		while true do
+			local v155 = nil;
+			v155, v105 = v152(v153, v154);
+			if not v155 then
+				break;
+			end;
+			v154 = v155;
+			if v105.KeyCode == Enum.KeyCode.Thumbstick1 then
+				v106 = "Position";
+				v107 = v105;
+				v108 = v106;
+				v109 = v107[v108];
+				local v156 = "magnitude";
+				v110 = v109;
+				v111 = v156;
+				v112 = v110[v111];
+				local v157 = 0.15;
+				v113 = v157;
+				v114 = v112;
+				if v113 < v114 then
+					local v158 = "Position";
+					v115 = v105;
+					v116 = v158;
+					local v159 = v115[v116];
+					v117 = v159;
+					u14 = v117;
+					local v160 = u9;
+					v118 = v160;
+					if v118 then
+						v160 = time() - u9;
+					end;
+					v119 = v160;
+					if (not v119 or v160 <= 0.5) and u15 and v105.Position.magnitude > 0.75 then
+						if u8 == 0 then
+							u9 = u9 or time();
+						end;
+						set_sprinting(false);
+						u8 = u8 + 1;
+						u15 = false;
+					elseif v105.Position.magnitude < 0.75 then
+						u15 = true;
+						if not v160 or v160 > 0.5 then
+							u8 = 0;
+							u9 = nil;
+						end;
+					end;
+					local v161 = u16;
+					v120 = v161;
+					if v120 and u8 >= 2 then
+						set_sprinting(true);
+						u8 = 0;
+						u9 = nil;
+					end;
+					local v162 = "Position";
+					v121 = v105;
+					v122 = v162;
+					v123 = v121[v122];
+					local v163 = "X";
+					v124 = v123;
+					v125 = v163;
+					v132 = v124[v125];
+					local v164 = "Position";
+					v126 = v105;
+					v127 = v164;
+					v128 = v126[v127];
+					local v165 = "Y";
+					v129 = v128;
+					v130 = v165;
+					local v166 = v129[v130];
+					v131 = v166;
+					v135 = v131;
+					v133 = v132;
+					v136 = v133;
+					v134 = math.atan2;
+					v137 = v134;
+					v138 = v135;
+					v139 = v136;
+					local v167 = v137(v138, v139);
+					local v168 = math.pi;
+					local v169 = 2;
+					v140 = v168;
+					v141 = v169;
+					local v170 = v140 / v141;
+					v142 = v167;
+					v143 = v170;
+					local v171 = v142 - v143;
+					local v172 = u6;
+					v144 = v171;
+					v145 = v172;
+					local v173 = v144 % v145;
+					v146 = v173;
+					return v146;
+				else
+					u14 = nil;
+					return nil;
+				end;
+			end;		
+		end;
+		v147 = nil;
+		v148 = v147;
+		u14 = v148;
+		v149 = v150;
+		return v149;
+	else
+		v147 = nil;
+		v148 = v147;
+		u14 = v148;
+		v149 = v150;
+		return v149;
+	end;
+	v106 = "Position";
+	v107 = v105;
+	v108 = v106;
+	v109 = v107[v108];
+	v156 = "magnitude";
+	v110 = v109;
+	v111 = v156;
+	v112 = v110[v111];
+	v157 = 0.15;
+	v113 = v157;
+	v114 = v112;
+	if v113 < v114 then
+		v158 = "Position";
+		v115 = v105;
+		v116 = v158;
+		v159 = v115[v116];
+		v117 = v159;
+		u14 = v117;
+		v160 = u9;
+		v118 = v160;
+		if v118 then
+			v160 = time() - u9;
+		end;
+		v119 = v160;
+		if (not v119 or v160 <= 0.5) and u15 and v105.Position.magnitude > 0.75 then
+			if u8 == 0 then
+				u9 = u9 or time();
+			end;
+			set_sprinting(false);
+			u8 = u8 + 1;
+			u15 = false;
+		elseif v105.Position.magnitude < 0.75 then
+			u15 = true;
+			if not v160 or v160 > 0.5 then
+				u8 = 0;
+				u9 = nil;
+			end;
+		end;
+		v161 = u16;
+		v120 = v161;
+		if v120 and u8 >= 2 then
+			set_sprinting(true);
+			u8 = 0;
+			u9 = nil;
+		end;
+		v162 = "Position";
+		v121 = v105;
+		v122 = v162;
+		v123 = v121[v122];
+		v163 = "X";
+		v124 = v123;
+		v125 = v163;
+		v132 = v124[v125];
+		v164 = "Position";
+		v126 = v105;
+		v127 = v164;
+		v128 = v126[v127];
+		v165 = "Y";
+		v129 = v128;
+		v130 = v165;
+		v166 = v129[v130];
+		v131 = v166;
+		v135 = v131;
+		v133 = v132;
+		v136 = v133;
+		v134 = math.atan2;
+		v137 = v134;
+		v138 = v135;
+		v139 = v136;
+		v167 = v137(v138, v139);
+		v168 = math.pi;
+		v169 = 2;
+		v140 = v168;
+		v141 = v169;
+		v170 = v140 / v141;
+		v142 = v167;
+		v143 = v170;
+		v171 = v142 - v143;
+		v172 = u6;
+		v144 = v171;
+		v145 = v172;
+		v173 = v144 % v145;
+		v146 = v173;
+		return v146;
+	else
+		u14 = nil;
+		return nil;
+	end;
+	v158 = "Position";
+	v115 = v105;
+	v116 = v158;
+	v159 = v115[v116];
+	v117 = v159;
+	u14 = v117;
+	v160 = u9;
+	v118 = v160;
+	if v118 then
+		v160 = time() - u9;
+	end;
+	v119 = v160;
+	if (not v119 or v160 <= 0.5) and u15 and v105.Position.magnitude > 0.75 then
+		if u8 == 0 then
+			u9 = u9 or time();
+		end;
+		set_sprinting(false);
+		u8 = u8 + 1;
+		u15 = false;
+	elseif v105.Position.magnitude < 0.75 then
+		u15 = true;
+		if not v160 or v160 > 0.5 then
+			u8 = 0;
+			u9 = nil;
+		end;
+	end;
+	v161 = u16;
+	v120 = v161;
+	if v120 and u8 >= 2 then
+		set_sprinting(true);
+		u8 = 0;
+		u9 = nil;
+	end;
+	v162 = "Position";
+	v121 = v105;
+	v122 = v162;
+	v123 = v121[v122];
+	v163 = "X";
+	v124 = v123;
+	v125 = v163;
+	v132 = v124[v125];
+	v164 = "Position";
+	v126 = v105;
+	v127 = v164;
+	v128 = v126[v127];
+	v165 = "Y";
+	v129 = v128;
+	v130 = v165;
+	v166 = v129[v130];
+	v131 = v166;
+	v135 = v131;
+	v133 = v132;
+	v136 = v133;
+	v134 = math.atan2;
+	v137 = v134;
+	v138 = v135;
+	v139 = v136;
+	v167 = v137(v138, v139);
+	v168 = math.pi;
+	v169 = 2;
+	v140 = v168;
+	v141 = v169;
+	v170 = v140 / v141;
+	v142 = v167;
+	v143 = v170;
+	v171 = v142 - v143;
+	v172 = u6;
+	v144 = v171;
+	v145 = v172;
+	v173 = v144 % v145;
+	v146 = v173;
+	return v146;
+end;
+local u50 = nil;
+local function u51(p17, p18)
+	local v174 = l__LocalPlayer__2.Character and l__LocalPlayer__2.Character.PrimaryPart;
+	if not v174 then
+		return;
+	end;
+	local v175 = workspace.CurrentCamera:ScreenPointToRay(p17, p18);
+	local v176, v177 = workspace:FindPartOnRayWithIgnoreList(Ray.new(v175.Origin, v175.Direction.unit * v3), v19, true);
+	return v176, v177, v176 and v11.magnitude(v176.Position - v174.Position) or nil;
+end;
+local function u52(p19, p20)
+	local v178, v179, v180, v181 = workspace:FindPartOnRayWithIgnoreList(p19, p20, true, true);
+	local l__items__182 = workspace.placeFolders:FindFirstChild("items");
+	while v178 do
+		if v178.CanCollide and ((not v178:IsDescendantOf(v18) or not v178:FindFirstChild("entityType") or v178.entityType.Value ~= "pet") and v181 ~= Enum.Material.Water) then
+			if l__items__182 == nil then
+				break;
+			end;
+			if not v178:IsDescendantOf(l__items__182) then
+				break;
+			end;
+		end;
+		p20[#p20 + 1] = v178;
+		local v183, v184, v185, v186 = workspace:FindPartOnRayWithIgnoreList(p19, p20, true, true);
+		v178 = v183;
+		v179 = v184;
+		v180 = v185;
+		v181 = v186;	
+	end;
+	return v178, v179, v180, v181;
+end;
+local u53 = false;
+local u54 = true;
+local u55 = nil;
+local u56 = nil;
+local u57 = nil;
+local u58 = false;
+local u59 = false;
+local function u60()
+	local v187 = l__LocalPlayer__2.Character and l__LocalPlayer__2.Character.PrimaryPart;
+	if not v187 then
+		return;
+	end;
+	if tick() - u17 >= 0.3 then
+		u17 = tick();
+		local v188 = {};
+		local v189, v190 = v9.raycastFromCurrentScreenPoint({ v17 });
+		if v189 then
+			local v191 = nil;
+			local v192, v193 = v13.canPlayerDamageTarget(l__LocalPlayer__2, v189);
+			if v192 and v193 then
+				if v193.entityId.Value == "character" then
+					local v194 = game.Players:GetPlayerFromCharacter(v193.Parent);
+				elseif v193.entityId.Value == "monster" then
+					v191 = v193;
+				end;
+			end;
+			if v191 and not v191:FindFirstChild("pet") and not v191:FindFirstChild("isStealthed") then
+				local l__magnitude__195 = (v191.Position - v187.Position).magnitude;
+				if l__magnitude__195 <= 50 then
+					u18 = v191;
+					u19 = l__magnitude__195;
+					return u18, u19;
+				end;
+			end;
+		end;
+		local v196 = nil;
+		local v197 = 50;
+		local v198, v199, v200 = pairs((v13.getDamagableTargets(game.Players.LocalPlayer)));
+		while true do
+			local v201, v202 = v198(v199, v200);
+			if not v201 then
+				break;
+			end;
+			if v202:FindFirstChild("isStealthed") == nil then
+				local v203 = v11.magnitude(v202.Position - v187.Position);
+				if v203 < v197 then
+					local v204, v205 = l__Camera__20:WorldToScreenPoint(v202.Position);
+					if v204.Z > 0 then
+						local v206 = false;
+						if v204.X >= 0 then
+							v206 = false;
+							if v204.X <= v1.AbsoluteSize.X then
+								v206 = false;
+								if v204.Y >= 0 then
+									v206 = false;
+									if v204.Y <= v1.AbsoluteSize.Y then
+										v206 = v204.Z > 0;
+									end;
+								end;
+							end;
+						end;
+						if v206 and v202.health.Value > 0 then
+							v196 = v202;
+							v197 = v203;
+						end;
+					end;
+				end;
+			end;		
+		end;
+		u18 = v196;
+		u19 = v197;
+	end;
+	return u18, u19;
+end;
+local u61 = nil;
+local function u62(p21)
+	local v207 = v8:invoke("getCacheValueByNameTag", "abilities");
+	if v207 then
+		for v208, v209 in pairs(v207) do
+			if v209.id == p21 and v209.rank > 0 then
+				return true;
+			end;
+		end;
+	end;
+	local v210 = v8:invoke("getCacheValueByNameTag", "equipment");
+	if v210 then
+		local v211, v212, v213 = pairs(v210);
+		while true do
+			local v214, v215 = v211(v212, v213);
+			if not v214 then
+				break;
+			end;
+			local v216 = v25[v215];
+			if v216.abilityUpgrades then
+				for v217, v218 in pairs(v216.abilityUpgrades) do
+					if v218.id == p21 then
+						return true;
+					end;
+				end;
+			end;
+			if v216.abilities then
+				for v219, v220 in pairs(v216.abilities) do
+					if v220.id == p21 then
+						return true;
+					end;
+				end;
+			end;		
+		end;
+	end;
+	if v16[p21]((v8:invoke("getLocalPlayerDataCache"))).free then
+		return true;
+	end;
+	return false;
+end;
+function perform_forceJump(p22, p23)
+	if l__LocalPlayer__2.Character then
+		if not l__LocalPlayer__2.Character.PrimaryPart then
+			return;
+		end;
+	else
+		return;
+	end;
+	if v8:invoke("getIsCurrentlyConsuming") then
+		return;
+	end;
+	if v36("stunned") then
+		return;
+	end;
+	if v36("root") then
+		return;
+	end;
+	local l__statistics_final__221 = v8:invoke("getCacheValueByNameTag", "nonSerializeData").statistics_final;
+	local v222 = l__statistics_final__221 and l__statistics_final__221.jump or 75;
+	if not (not l__LocalPlayer__2.Character.PrimaryPart:FindFirstChild("grounded")) then
+		v222 = v222 * 0.8;
+	end;
+	if u23.isJumping then
+		if l__LocalPlayer__2.Character.PrimaryPart.state.Value ~= "dead" then
+			if not u23.isExhausted then
+				if u62(7) then
+					if not u23.isDoubleJumping then
+						if u23.isInAir then
+							u37("isDoubleJumping", true);
+							if -50 < u39.Y then
+								u39 = Vector3.new(u39.X, v222, u39.Z);
+							else
+								v77:applyJoltVelocity(Vector3.new(0, v222 + 50, 0));
+							end;
+							v8:fire("stopChannels", "jump");
+							u41 = tick();
+						end;
+					end;
+				end;
+			end;
+		end;
+	elseif l__LocalPlayer__2.Character.PrimaryPart.state.Value ~= "dead" then
+		if not u23.isExhausted then
+			u37("isJumping", true);
+			v8:fire("stopChannels", "jump");
+			v77:applyJoltVelocity(Vector3.new(0, v222, 0));
+			u41 = tick();
+		end;
+	end;
+	u55 = p22;
+	if u40 then
+		if p22 then
+			task.delay(p23 and 0.25, function()
+				if u40 then
+					if p22.UserInputState == Enum.UserInputState.Begin then
+
+					else
+						if u40 then
+							if u23.isJumping then
+								u37("isJumping", false);
+								u37("isDoubleJumping", false);
+							end;
+							u37("isFalling", true);
+						end;
+						return;
+					end;
+				else
+					if u40 then
+						if u23.isJumping then
+							u37("isJumping", false);
+							u37("isDoubleJumping", false);
+						end;
+						u37("isFalling", true);
+					end;
+					return;
+				end;
+				u37("isSwimming", true);
+				u37("isSprinting", false);
+				u16 = false;
+				while true do
+					if u23.isJumping then
+
+					else
+						break;
+					end;
+					if u40 then
+
+					else
+						break;
+					end;
+					if p22.UserInputState ~= Enum.UserInputState.Begin then
+						if p22.UserInputState == Enum.UserInputState.Change then
+
+						else
+							break;
+						end;
+					end;
+					wait(0.05);				
+				end;
+				if u23.isJumping then
+					if u40 then
+						if not u23.isMoving then
+							u37("isSwimming", false);
+							u37("isJumping", false);
+							u37("isDoubleJumping", false);
+						else
+							u37("isJumping", false);
+							u37("isDoubleJumping", false);
+						end;
+					else
+						u37("isSwimming", false);
+						u37("isJumping", false);
+						u37("isDoubleJumping", false);
+					end;
+				end;
+				u16 = true;
+			end);
+		end;
+	end;
+end;
+v8:create("doJump", "BindableFunction", "OnInvoke", function(p24)
+	if not u33 and u54 then
+		perform_forceJump(p24);
+	end;
+end);
+v8:create("doSprint", "BindableFunction", "OnInvoke", function(p25)
+	set_sprinting(p25);
+end);
+local u63 = false;
+v8:create("signalBasicAttacking", "BindableEvent", "Event", function(p26)
+	u63 = p26;
+end);
+local function u64(p27)
+	u23.isSprinting = false;
+	u23.isInAir = false;
+	u23.isMoving = false;
+	u23.isJumping = false;
+	u23.isSitting = false;
+	u23.isExhausted = false;
+	u23.isDoubleJumping = false;
+	u23.isFishing = false;
+	u23.isRotating = false;
+	u23.isFalling = false;
+	u23.isGettingUp = false;
+	u23.isSwimming = false;
+	u23.isHarvesting = false;
+	u4 = false;
+	local u65 = false;
+	spawn(function()
+		if u65 then
+			for v223 = 1, 0.5, -0.03333333333333333 do
+				if not u4 then
+					break;
+				end;
+				u5 = v223;
+				wait();
+			end;
+			u5 = 0.5;
+			return;
+		end;
+		for v224 = 0.5, 1, 0.03333333333333333 do
+			if u4 then
+				break;
+			end;
+			u5 = v224;
+			wait();
+		end;
+		u5 = 1;
+	end);
+	u65 = "getMyClientCharacterContainer";
+	u24 = v8:invoke(u65);
+	if p27.PrimaryPart == nil then
+		u65 = "hitbox";
+		if p27:FindFirstChild(u65) then
+			p27.PrimaryPart = p27.hitbox;
+		end;
+	end;
+	local v225 = tick();
+	while true do
+		wait();
+		if p27.PrimaryPart then
+			break;
+		end;
+		if p27.Parent == nil then
+			break;
+		end;
+		u65 = tick;
+		u65 = u65();
+		u65 = 10;
+		if u65 <= u65 - v225 then
+			break;
+		end;	
+	end;
+	if not p27.PrimaryPart then
+		return false;
+	end;
+	u65 = v8;
+	v8.fireServer(u65, "replicateClientStateChanged", p27.PrimaryPart.state.Value);
+end;
+local function u66(p28, p29)
+	u53 = p29;
+	if p29 then
+		return false;
+	end;
+	if p28.KeyCode == Enum.KeyCode.W or p28.KeyCode == Enum.KeyCode.Up then
+		u10 = true;
+		if u23.isSwimming then
+			u37("isJumping", false);
+			u37("isDoubleJumping", false);
+			return;
+		end;
+	elseif p28.KeyCode == Enum.KeyCode.S or p28.KeyCode == Enum.KeyCode.Down then
+		u13 = true;
+		if u23.isSwimming then
+			u37("isJumping", false);
+			u37("isDoubleJumping", false);
+			return;
+		end;
+	elseif p28.KeyCode == Enum.KeyCode.D then
+		u12 = true;
+		if u23.isSwimming then
+			u37("isJumping", false);
+			u37("isDoubleJumping", false);
+			return;
+		end;
+	elseif p28.KeyCode == Enum.KeyCode.A then
+		u11 = true;
+		if u23.isSwimming then
+			u37("isJumping", false);
+			u37("isDoubleJumping", false);
+			return;
+		end;
+	else
+		if p28.KeyCode == Enum.KeyCode.LeftShift or p28.KeyCode == Enum.KeyCode.ButtonL3 and u23.isMoving then
+			if p28.KeyCode == Enum.KeyCode.ButtonL3 then
+				toggle_sprint();
+				return;
+			else
+				set_sprinting(true);
+				return;
+			end;
+		end;
+		if (p28.KeyCode == Enum.KeyCode.Space or p28.KeyCode == Enum.KeyCode.LeftAlt or p28.KeyCode == Enum.KeyCode.ButtonA) and not u33 and u54 then
+			perform_forceJump(p28);
+		end;
+	end;
+end;
+local function u67(p30)
+	if p30.UserInputType == Enum.UserInputType.MouseMovement then
+		u50 = p30;
+	end;
+end;
+local function u68(p31)
+	if p31.KeyCode == Enum.KeyCode.W or p31.KeyCode == Enum.KeyCode.Up then
+		u10 = false;
+		return;
+	end;
+	if p31.KeyCode == Enum.KeyCode.S or p31.KeyCode == Enum.KeyCode.Down then
+		u13 = false;
+		return;
+	end;
+	if p31.KeyCode == Enum.KeyCode.D then
+		u12 = false;
+		return;
+	end;
+	if p31.KeyCode == Enum.KeyCode.A then
+		u11 = false;
+		return;
+	end;
+	if p31.KeyCode == Enum.KeyCode.LeftShift or p31.KeyCode == Enum.KeyCode.ButtonL3 then
+		set_sprinting(false);
+		return;
+	end;
+	if p31.KeyCode == Enum.KeyCode.P then
+
+	end;
+end;
+local function u69()
+	if u61 then
+		u61:disconnect();
+		u61 = nil;
+	end;
+end;
+local function u70(p32)
+	u4 = p32;
+	spawn(function()
+		if p32 then
+			for v226 = 1, 0.5, -0.03333333333333333 do
+				if not u4 then
+					break;
+				end;
+				u5 = v226;
+				wait();
+			end;
+			u5 = 0.5;
+			return;
+		end;
+		for v227 = 0.5, 1, 0.03333333333333333 do
+			if u4 then
+				break;
+			end;
+			u5 = v227;
+			wait();
+		end;
+		u5 = 1;
+	end);
+end;
+local function u71(p33)
+	u36 = p33;
+end;
+local function u72(p34)
+	u54 = p34;
+end;
+local function u73(p35)
+	u16 = p35;
+end;
+local function u74(p36, p37, ...)
+	if u23[p36] == nil then
+		return;
+	end;
+	return u37(p36, p37, ...);
+end;
+local function u75(p38)
+	if p38 then
+		u60();
+	end;
+	return u18;
+end;
+local function u76()
+	return u36;
+end;
+local function u77()
+	local v228 = l__LocalPlayer__2.Character and (l__LocalPlayer__2.Character.PrimaryPart and l__LocalPlayer__2.Character.PrimaryPart:FindFirstChild("hitboxVelocity"));
+	if not v228 then
+		return Vector3.new(0, 0, 0);
+	end;
+	return v228.Velocity;
+end;
+local function u78(p39)
+	u59 = p39;
+end;
+local function u79()
+	return u23;
+end;
+local function u80(p40, p41)
+	u1 = p41;
+	u2 = u1.walkspeed and 14;
+end;
+local function u81(p42, p43)
+	if p42 == "equipment" then
+		local v229 = nil;
+		for v230, v231 in pairs(p43) do
+			if v231.position == 1 then
+				v229 = v231;
+			end;
+		end;
+		if v229 then
+			u57 = (v25(v229) or {}).equipmentType;
+		end;
+	end;
+end;
+local function u82()
+	if l__LocalPlayer__2.Character and l__LocalPlayer__2.Character.PrimaryPart and l__LocalPlayer__2.Character.PrimaryPart.state.Value ~= "dead" then
+		if u61 then
+			u61:disconnect();
+			u61 = nil;
+		end;
+		u61 = l__RunService__29.Stepped:connect(function(p44, p45)
+			local l__gameUI__232 = l__LocalPlayer__2:WaitForChild("PlayerGui"):FindFirstChild("gameUI");
+			if l__gameUI__232 then
+				u45 = l__gameUI__232:FindFirstChild("input") and require(l__gameUI__232.input) or u45;
+				u46 = l__gameUI__232:FindFirstChild("focus") and require(l__gameUI__232.focus) or u46;
+				u47 = l__gameUI__232:FindFirstChild("menuButtons") and require(l__gameUI__232.menuButtons.menuButtons) or u47;
+			end;
+			local v233 = l__LocalPlayer__2.Character and l__LocalPlayer__2.Character.PrimaryPart;
+			local v234 = v233 and v233:FindFirstChild("grounder");
+			local v235 = v233 and v233:FindFirstChild("hitboxVelocity");
+			local v236 = v233 and v233:FindFirstChild("hitboxGyro");
+			if not v234 or not v235 or not v236 then
+				return;
+			end;
+			if u38 then
+				v234.MaxForce = Vector3.new(100000, 100000, 100000);
+				v235.MaxForce = Vector3.new(0, 0, 0);
+				v236.CFrame = u38;
+				v234.Position = u38.Position;
+				return;
+			end;
+			if u45.mode.Value ~= u48 then
+				toggle_sprint(false);
+			end;
+			u48 = u45.mode.Value;
+			local v237 = u49();
+			local v238 = nil;
+			if u50 then
+				local v239, v240 = u51(u50.Position.X, u50.Position.Y);
+				p44 = v239;
+				v238 = v240;
+			end;
+			local v241 = { v7.awaitPlaceFolder("playerRenderCollection"), v7.awaitPlaceFolder("playerManifestCollection"), u24 };
+			local v242, v243, v244, v245 = u52(Ray.new(v233.Position, Vector3.new(0, -5, 0)), v241);
+			if not u23.isJumping then
+				if u40 then
+					if not u10 and not u13 and not u12 and not u11 then
+						local v246 = false;
+						if not u53 and not u33 and u54 and u55 and (u55.UserInputState == Enum.UserInputState.Begin or u55.UserInputState == Enum.UserInputState.Change) then
+							perform_forceJump(u55, 0);
+							v246 = true;
+						end;
+						if not v246 and u23.isSwimming then
+							u37("isSwimming", false);
+						end;
+					end;
+				elseif u23.isSwimming then
+					u37("isSwimming", false);
+				end;
+			end;
+			local v247 = 2.5;
+			if v11.magnitude(u36) > 0.1 then
+				local l__Unit__248 = u36.Unit;
+				local v249, v250 = u52(Ray.new(v233.Position, Vector3.new(l__Unit__248.X, -v247, l__Unit__248.Z)), v241);
+				if v249 then
+					local v251 = v250.Y - (v233.Position.Y - v247);
+					if v251 > 0 and v251 < v247 then
+						v247 = v247 + v251 * 12;
+					end;
+				end;
+			end;
+			if v242 then
+				if game.CollectionService:HasTag(v242, "ActivePart") then
+					v8:fire("touchedActivePart", v242, v233);
+				end;
+				if u23.isSprinting and u24 and u24:FindFirstChild("entity") then
+					u24.entity.RightFoot.ParticleEmitter.Enabled = true;
+					u24.entity.LeftFoot.ParticleEmitter.Enabled = true;
+					local v252 = v242.Color;
+					if v242:IsA("Terrain") and v245 ~= Enum.Material.Air then
+						v252 = v242:GetMaterialColor(v245);
+					end;
+					u24.entity.LeftFoot.ParticleEmitter.Color = ColorSequence.new(v252);
+					u24.entity.RightFoot.ParticleEmitter.Color = ColorSequence.new(v252);
+				end;
+				if v242:isDescendantOf(v18) or v242:isDescendantOf(v17) then
+					local v253 = v242:FindFirstChild("clientHitboxToServerHitboxReference") and v242 or (v242.Parent:FindFirstChild("clientHitboxToServerHitboxReference") and v242.Parent or (v242.Parent.Parent:FindFirstChild("clientHitboxToServerHitboxReference") and v242.Parent.Parent or v242.Parent.Parent.Parent:FindFirstChild("clientHitboxToServerHitboxReference") and v242.Parent.Parent.Parent));
+					local v254 = v242.Parent;
+					if v253 then
+						v254 = v253.clientHitboxToServerHitboxReference.Value.Parent;
+					end;
+					if game.Players:GetPlayerFromCharacter(v254) then
+						u44 = 500 * v242.Friction;
+					else
+						u44 = 0;
+						local v255 = (v233.Position - v242.Position).unit * 10;
+						u39 = u39 + Vector3.new(v255.X, 0, v255.Z);
+					end;
+				else
+					u44 = 500 * v242.Friction;
+					if u23.isSwimming and not u23.isJumping then
+						u37("isSwimming", false);
+					end;
+				end;
+			end;
+			if not u40 or not u23.isSwimming then
+				if u39.Y > 0.1 or v242 == nil or v247 + 1 < v233.Position.Y - v243.Y then
+					v235.MaxForce = Vector3.new(10000, 10000, 10000);
+					v234.MaxForce = Vector3.new();
+					u23.isInAir = true;
+					if u39.Y < -30 and not u23.isFalling then
+						u37("isFalling", true);
+					end;
+					if not u56 and v233.Velocity.Y < -30 and u23.isFalling then
+						u56 = v233.Position;
+					end;
+					if u23.isSprinting and u24 and u24:FindFirstChild("entity") then
+						u24.entity.RightFoot.ParticleEmitter.Enabled = false;
+						u24.entity.LeftFoot.ParticleEmitter.Enabled = false;
+					end;
+				else
+					(function()
+						v234.MaxForce = Vector3.new(0, 10000, 0);
+						v235.MaxForce = Vector3.new(10000, 0, 10000);
+						u23.isInAir = false;
+						if u23.isJumping then
+							u37("isJumping", false);
+							u37("isDoubleJumping", false);
+							if u23.isFalling then
+								local l__Y__256 = u39.Y;
+							end;
+							u37("isFalling", false);
+						elseif u23.isFalling then
+							local l__Y__257 = u39.Y;
+							u37("isFalling", false);
+						end;
+						v234.Position = v243 + Vector3.new(0, v247, 0);
+					end)();
+				end;
+			else
+				v235.MaxForce = Vector3.new(10000, 10000, 10000);
+				v234.MaxForce = Vector3.new();
+			end;
+			local v258 = v238 and CFrame.new(v233.Position, Vector3.new(v238.X, v233.Position.Y, v238.Z)).lookVector;
+			local v259 = v258 and (v258 - Vector3.new(0, v258.Y, 0)).unit;
+			if u3 then
+				v259 = v233.CFrame.lookVector * Vector3.new(1, 0, 1);
+			end;
+			local v260 = nil;
+			if u45.mode.Value == "xbox" and not (not u46.focused) or game.GuiService.SelectedObject ~= nil then
+				v74(true);
+				u35.xboxArrested = true;
+			elseif u35.xboxArrested then
+				v74(false);
+			end;
+			if not u33 then
+				if v237 then
+					local l__LookVector__261 = workspace.CurrentCamera.CFrame:toWorldSpace(CFrame.Angles(0, v237, 0)).LookVector;
+					if u23.isSwimming and not u23.isJumping then
+						local v262 = l__LookVector__261.Unit;
+					else
+						v262 = (l__LookVector__261 - Vector3.new(0, l__LookVector__261.Y, 0)).Unit;
+					end;
+					if u23.isSwimming and not u23.isJumping then
+						local v263 = CFrame.Angles(-1.5707963267948966, 0, 0);
+					else
+						v263 = CFrame.new();
+					end;
+					local v264 = u2;
+					if u25 then
+						v264 = v264 * 2 + 1;
+					end;
+					u14 = u14 or Vector3.new(1, 0, 0);
+					u36 = v262 * (v264 * math.clamp(u5, 0.5, 1)) * u14.magnitude;
+					v235.Velocity = v77:stepCurrentVelocity(p45);
+					if u57 ~= "bow" and not u58 and not u59 and v259 then
+						if not u23.isSprinting then
+							local v265 = v262:Dot(v259);
+							local v266 = math.sign(v262:Cross(v259):Dot(Vector3.new(0, 1, 0)));
+							if math.acos(v265) <= 0.3490658503988659 then
+								v260 = CFrame.new(Vector3.new(), v259):ToWorldSpace(v263);
+							elseif not (v265 < 0) then
+								v260 = CFrame.Angles(0, 0.3490658503988659 * v266, 0) * CFrame.new(Vector3.new(), v262):ToWorldSpace(v263);
+							else
+								v260 = CFrame.new(Vector3.new(), v262):ToWorldSpace(v263);
+							end;
+						else
+							v260 = CFrame.new(Vector3.new(), v262):ToWorldSpace(v263);
+						end;
+					elseif u58 then
+						if u23.isSwimming then
+							v260 = CFrame.new(Vector3.new(), l__Camera__20.CFrame.LookVector):ToWorldSpace(v263);
+						else
+							v260 = CFrame.new(Vector3.new(), l__Camera__20.CFrame.lookVector * Vector3.new(1, 0, 1)):ToWorldSpace(v263);
+						end;
+					elseif v259 then
+						v260 = CFrame.new(Vector3.new(), v259):ToWorldSpace(v263);
+					else
+						v260 = CFrame.new(Vector3.new(), v262):ToWorldSpace(v263);
+					end;
+					l__assets__4.bRef.Value = v235;
+					u37("isMoving", true);
+				else
+					if u58 then
+						v260 = CFrame.new(Vector3.new(), l__Camera__20.CFrame.lookVector * Vector3.new(1, 0, 1));
+					elseif v259 then
+						v260 = v259 and CFrame.new(Vector3.new(), v259);
+					end;
+					u36 = Vector3.new();
+					v235.Velocity = v77:stepCurrentVelocity(p45);
+					u37("isMoving", false);
+				end;
+			else
+				v235.Velocity = v77:stepCurrentVelocity(p45);
+			end;
+			u60();
+			if (not u23.isSwimming or not v260) and u18 and u57 ~= "bow" and not u58 and not u23.isSprinting and not u59 and v260 then
+				local v267 = ((u19 - 10) / 40) ^ 2;
+				if 0.05 * (u19 - 10) < 0 then
+					v267 = 0;
+				end;
+				v260 = v260:lerp(CFrame.new(v233.Position, Vector3.new(u18.Position.X, v233.Position.Y, u18.Position.Z)), (math.clamp(1 - v267, 0, 1)));
+			end;
+			if not u33 and v260 and l__LocalPlayer__2.Character and l__LocalPlayer__2.Character.PrimaryPart and l__LocalPlayer__2.Character.PrimaryPart.state.Value ~= "dead" and not u30 then
+				if u23.isSwimming then
+					v236.CFrame = v236.CFrame:lerp(v260, 0.1);
+				elseif u58 then
+					v236.CFrame = v260;
+				else
+					v236.CFrame = v236.CFrame:lerp(v260, 0.1);
+				end;
+				if math.abs(1 - Vector3.new(v260.lookVector.X, 0, v260.lookVector.Z).unit:Dot(Vector3.new(v233.CFrame.lookVector.X, 0, v233.CFrame.lookVector.Z).unit)) > 0.05 then
+					if not u23.isRotating then
+						u37("isRotating", true);
+					end;
+				elseif u23.isRotating then
+					u37("isRotating", false);
+				end;
+			end;
+		end);
+	end;
+end;
+(function()
+	if l__LocalPlayer__2.Character then
+		u64(l__LocalPlayer__2.Character);
+	end;
+	v8:connect("myClientCharacterContainerChanged", "Event", function()
+		u64(l__LocalPlayer__2.Character);
+	end);
+	v8:connect("toggleCameraLockChanged", "Event", function(p46)
+		u58 = p46;
+	end);
+	l__UserInputService__20.InputBegan:connect(u66);
+	l__UserInputService__20.InputChanged:connect(u67);
+	l__UserInputService__20.InputEnded:connect(u68);
+	v8:connect("myClientCharacterDied", "Event", u69);
+	v8:create("stopChannels", "BindableEvent");
+	v8:create("setIsChanneling", "BindableFunction", "OnInvoke", u70);
+	v8:create("setMovementVelocity", "BindableFunction", "OnInvoke", u71);
+	v8:create("setIsJumpEnabled", "BindableFunction", "OnInvoke", u72);
+	v8:create("setIsSprintingEnabled", "BindableFunction", "OnInvoke", u73);
+	v8:create("characterStateChanged", "BindableEvent");
+	v8:create("setCharacterMovementState", "BindableFunction", "OnInvoke", u74);
+	v8:create("forceCharacterMovementState", "RemoteEvent", "OnClientEvent", u74);
+	v8:create("getCurrentlyFacingManifest", "BindableFunction", "OnInvoke", u75);
+	v8:create("getMovementVelocity", "BindableFunction", "OnInvoke", u76);
+	v8:create("getTotalVelocity", "BindableFunction", "OnInvoke", u77);
+	v8:create("setIsCastingSpell", "BindableFunction", "OnInvoke", u78);
+	v8:create("getCharacterMovementStates", "BindableFunction", "OnInvoke", u79);
+	v8:connect("playerStatisticsChanged", "OnClientEvent", u80);
+	v8:connect("propogationRequestToSelf", "Event", u81);
+	v8:connect("setStamina", "OnClientEvent", function(p47, p48)
+		local l__Character__268 = l__LocalPlayer__2.Character;
+		if not l__Character__268 then
+			return;
+		end;
+		local l__PrimaryPart__269 = l__Character__268.PrimaryPart;
+		if not l__PrimaryPart__269 then
+			return;
+		end;
+		if not l__PrimaryPart__269:FindFirstChild("stamina") then
+			return;
+		end;
+		local l__maxStamina__270 = l__PrimaryPart__269:FindFirstChild("maxStamina");
+		if not l__maxStamina__270 then
+			return;
+		end;
+		if p47 == "max" then
+			p47 = l__maxStamina__270.Value;
+		end;
+		if p48 then
+			u37("isExhausted", false);
+		end;
+	end);
+	u1 = v8:invoke("getCacheValueByNameTag", "nonSerializeData").statistics_final;
+	u2 = u1 and u1.walkspeed or 14;
+	while not l__LocalPlayer__2.Character or not l__LocalPlayer__2.Character.PrimaryPart do
+		wait(0.5);	
+	end;
+	local u83 = tick();
+	l__UserInputService__20.InputBegan:connect(function()
+		u83 = tick();
+	end);
+	spawn(function()
+		while true do
+			if l__LocalPlayer__2.Character and l__LocalPlayer__2.Character.PrimaryPart and l__LocalPlayer__2.Character.PrimaryPart.state.Value == "idling" and tick() - u83 > 5 and not u30 and not u63 then
+				local v271 = { "idling_kicking" };
+				v21:replicatePlayerAnimationSequence("emoteAnimations", v271[math.random(#v271)]);
+			end;
+			wait(math.random(5, 10));		
+		end;
+	end);
+	u82();
+end)();
