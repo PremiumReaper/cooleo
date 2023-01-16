@@ -160,11 +160,11 @@ function Library:AddToolTip(InfoStr, HoverInstance)
     Library:AddToRegistry(Label, {
         TextColor3 = 'FontColor',
     });
-
+    
     local IsHovering = false
     HoverInstance.MouseEnter:Connect(function()
         IsHovering = true
-
+        
         Tooltip.Position = UDim2.fromOffset(Mouse.X + 15, Mouse.Y + 12)
         Tooltip.Visible = true
 
@@ -531,7 +531,7 @@ do
             Rotation = 90;
             Parent = HueSelectorInner;
         });
-
+        
         HueBox.FocusLost:Connect(function(enter)
             if enter then
                 local success, result = pcall(Color3.fromHex, HueBox.Text)
@@ -833,7 +833,7 @@ do
 
             local YSize = 0
             local XSize = 0
-
+            
             for _, Label in next, Library.KeybindContainer:GetChildren() do
                 if Label:IsA('TextLabel') and Label.Visible then
                     YSize = YSize + 18;
@@ -1373,7 +1373,7 @@ do
 
             Position = UDim2.fromOffset(0, 0),
             Size = UDim2.fromScale(5, 1),
-
+            
             Font = Library.Font;
             PlaceholderColor3 = Color3.fromRGB(190, 190, 190);
             PlaceholderText = Info.Placeholder or '';
@@ -1387,7 +1387,7 @@ do
             ZIndex = 7;
             Parent = Container;
         });
-
+        
         function Textbox:SetValue(Text)
             if Info.MaxLength and #Text > Info.MaxLength then
                 Text = Text:sub(1, Info.MaxLength);
@@ -1401,7 +1401,7 @@ do
 
             Textbox.Value = Text;
             Box.Text = Text;
-
+                
             if Textbox.Changed then
                 Textbox.Changed(Textbox.Value)
             end;
@@ -1410,7 +1410,7 @@ do
         if Textbox.Finished then
             Box.FocusLost:Connect(function(enter)
                 if not enter then return end
-
+                
                 Textbox:SetValue(Box.Text);
                 Library:AttemptSave();
             end)
@@ -1438,7 +1438,7 @@ do
                     -- calculate pixel width of text from start to cursor
                     local subtext = string.sub(Box.Text, 1, cursor-1)
                     local width = TextService:GetTextSize(subtext, Box.TextSize, Box.Font, Vector2.new(math.huge, math.huge)).X
-
+                    
                     -- check if we're inside the box with the cursor
                     local currentCursorPos = Box.Position.X.Offset + width
 
@@ -1730,7 +1730,7 @@ do
                 return math.floor(Value);
             end;
 
-
+    
             return tonumber(string.format('%.' .. Slider.Rounding .. 'f', Value))
         end;
 
@@ -2144,7 +2144,7 @@ do
 
             Dropdown:SetValues();
             Dropdown:Display();
-
+            
             if Dropdown.Changed then Dropdown.Changed(Dropdown.Value) end
         end;
 
@@ -2342,7 +2342,7 @@ do
         Size = UDim2.new(1, 0, 0, 20);
         Position = UDim2.fromOffset(5, 2),
         TextXAlignment = Enum.TextXAlignment.Left,
-
+        
         Text = 'Keybinds';
         ZIndex = 104;
         Parent = KeybindInner;
@@ -2485,9 +2485,9 @@ function Library:CreateWindow(...)
         Config.Title = Arguments[1]
         Config.AutoShow = Arguments[2] or false;
     end
-
+    
     if type(Config.Title) ~= 'string' then Config.Title = 'No title' end
-
+    
     if typeof(Config.Position) ~= 'UDim2' then Config.Position = UDim2.fromOffset(175, 50) end
     if typeof(Config.Size) ~= 'UDim2' then Config.Size = UDim2.fromOffset(550, 600) end
 
